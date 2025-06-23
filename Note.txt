@@ -7,3 +7,7 @@ DB 접근 기술 - ORM Object... -> JPA; Java Persistence... > Hibernate
  > EM -- 2. JPQL(객체 지향 쿼리 개념)
  > EM -- 3. Method(Persist Context)
 * 뷰 리졸버는 컨트롤러가 반환한 논리적 뷰 이름(예: "home")과 Model 데이터를 받아 실제 Mustache 템플릿(예: home.mustache)으로 매핑합니다.
+
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+연관관계 ->> JOIN 필요할때 연관관계 설정해야함
+데이터 가져오는 - Lazy 전략(요구한것만) / Eager 전략(전부다)
