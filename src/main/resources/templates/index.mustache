@@ -1,0 +1,30 @@
+{{> layout/header}}
+
+<div class="container p-5">
+
+    <!--
+    {{!boardList}} (mustache 주석)
+    #boardList 리스트가 존재하고 비어있지 않으면 반복 실행한다
+    -->
+    {{#boardList}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <!-- {{!title}} :
+                현재 Board 객체의 title member variable 에 값을 출력
+                mustache는 자동으로 getTitle() method를 호출
+                -->
+                <h4 class="card-title mb-3">{{title}}</h4>
+                <p style="color:gray; font-size:.8rem">{{time}}</p>
+                <a href="/board/{{id}}" class="btn btn-primary">Detail</a>
+            </div>
+        </div>
+    {{/boardList}}
+
+    <ul class="pagination d-flex justify-content-center">
+        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+    </ul>
+
+</div>
+
+{{> layout/footer}}

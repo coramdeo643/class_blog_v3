@@ -1,0 +1,61 @@
+###Developer
+server:
+  servlet:
+    encoding:
+      charset: utf-8
+      force: true
+  port: 8080
+
+# 로그 레벨의 개념
+# ERROR > WARNING > INFO > DEBUG > TRACE;
+logging:
+  level:
+    root: INFO # 모든 라이브러리는 INFO 이상만 출력
+    com.tenco: DEBUG # 내 프로젝트는 DEBUG 이상 모두 출력
+
+# Spring Environment Setting
+spring:
+  mustache:
+    suffix: .mustache
+    prefix: classpath:/templates/
+    cache: false
+    charset: UTF-8
+
+    servlet:
+      # Session & Request 속성을 템플릿에서 사용가능하게 한다
+      expose-session-attributes: true
+      expose-request-attributes: true
+  # DB Connection Setting (H2 In-memory DB)
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blog?useSSl=false&serverTimezone=Asia/Seoul
+    username: root
+    password: asd1234
+  # H2 DB Web Console Activation(Dev.)
+  # http://localhost:8080/h2-console
+  h2:
+    console:
+      enabled: true
+
+  sql:
+    init:
+      # 2.5 이상 버전 부터 mode: always
+      mode: always
+      data-locations:
+        - classpath:db/data.sql
+
+  # JPA 설정
+  jpa:
+    hibernate:
+      # create: 애플리케이션 시작시 테이블을 새로 생성
+      # 기존 데이터는 모두 삭제됨 (개발용)
+      ddl-auto: create
+    # SQL 쿼리를 콘솔에 출력 (개발용 디버깅)
+    show-sql: true
+    properties:
+      hibernate:
+        # SQL 쿼리를 보기 좋게 포맷팅
+        format_sql: true
+    # data.sql 파일을 Hibernate 초기화 이후에 실행
+    defer-datasource-initialization: true
+    # 기본값 : Entity - CamelCase -> DB 생성시 - SnakeCase 자동 설정
