@@ -1,5 +1,6 @@
 package com.tenco.blog.board;
 
+import com.tenco.blog.user.User;
 import com.tenco.blog.utils.MyDateUtil;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -18,27 +19,28 @@ public class Board {
     private Long id;
     private String title;
     private String content;
-    private String username;
+    // v2
+    // private String username;
+    // v3 : Board entity - User entity와 연관관계 성립
 
-    // CreationTimestamp : Brought by Hibernate
-    // Entity 가 처음 저장할때 현재 시간을 자동으로 설정
-    // PC -> DB(날짜 주입)
-    // v1(SQL now()) -> v2(JPA)
+    // 다대일 N:1 relation setting
+    // 여러개의 게시글에는 한명의 작성자를 가질수있어
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id") // FK column name
+    private User user;
+
     @CreationTimestamp
     private Timestamp createdAt; // created_at(auto-convert to SnakeCase)
 
     // Constructor
-    public Board(String title, String content, String username) {
-        this.title = title;
-        this.content = content;
-        this.username = username;
-        // id, createdAt => JPA/Hibernate 자동으로 설정
-    }
-
-    // mustache 에서 표현할 시간 을 포맷기능(행위)을 스스로 만들자
+//    public Board(String title, String content, String username) {
+//        this.title = title;
+//        this.content = content;
+//        //this.username = username;
+//    }
     public String getTime() {
         return MyDateUtil.timestampFormat(createdAt);
     }
-    
 }
 // DB first > Code first
