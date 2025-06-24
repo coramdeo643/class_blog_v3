@@ -9,13 +9,26 @@ import lombok.Data;
  */
 public class BoardRequest {
 
+    @Data
+    public static class UpdateDTO {
+        private String title;
+        private String content;
+//        private String username;
+        public void validate() throws IllegalAccessException {
+            if(title == null  || title.trim().isEmpty()) {
+                throw new IllegalAccessException("제목은 필수 입니다");
+            }
+            if(content == null || content.trim().isEmpty()) {
+                throw new IllegalAccessException("내용은 필수 입니다");
+            }
+        }
+    }
+
     // 게시글 저장 DTO
     @Data
     public static class SaveDTO {
         private String title;
         private String content;
-        // username 제거 : TODO 세션에서 가져올예정
-
         // (User) <-- toEntity() 호출 할 때 세션에서 가져와서 넣어준다
         public Board toEntity(User user){
             return Board.builder()

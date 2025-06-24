@@ -1,5 +1,6 @@
 package com.tenco.blog.board;
 
+import com.tenco.blog.user.User;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -47,8 +48,9 @@ public class BoardRepository {
     }
 
     @Transactional
-    public void delete(Board board) {
-        em.remove(board);
+    public void deleteById(Long id) {
+        Board b = findById(id);
+        em.remove(b);
     }
 
 }
