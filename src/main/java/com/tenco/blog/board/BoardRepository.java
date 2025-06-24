@@ -14,6 +14,7 @@ public class BoardRepository {
 
     /**
      * Save the post : User 와 연관관계를 가진 Board entity 영속화
+     *
      * @param board
      * @return board
      */
@@ -36,6 +37,7 @@ public class BoardRepository {
 
     /**
      * Post find once(PK; Primitive key)
+     *
      * @param id : Boarder entity id value
      * @return : Board entity
      */
@@ -44,5 +46,9 @@ public class BoardRepository {
         return em.find(Board.class, id);
     }
 
+    @Transactional
+    public void delete(Board board) {
+        em.remove(board);
+    }
 
 }

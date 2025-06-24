@@ -59,6 +59,27 @@ public class BoardController {
         }
     }
 
+    @PostMapping("/board/{id}/delete")
+    public String delete(@PathVariable(name = "id") Long id, HttpSession session) {
+        // 1. 권한 확인
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/login-form";
+        }
+        // 2. 게시글 존재 여부 확인
+        Board board = boardRepository.findById(id);
+        if (board == null) {
+            throw new IllegalArgumentException("Post not found");
+        }
+        // 3. 게시글 작성자 본인 확인
+        if (board.getUser().getId() != sessionUser.getId()) {
+            throw new IllegalArgumentException("You do not have permission to delete this post");
+        }
+        // 4. 삭제
+        boardRepository.delete(board);
+        return "redirect:/";
+    }
+
     @GetMapping("/")
     public String index(HttpServletRequest request) {
         // 1. Post List find
@@ -78,6 +99,4 @@ public class BoardController {
         request.setAttribute("board", board);
         return "board/detail";
     }
-
-
 }
