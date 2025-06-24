@@ -5,6 +5,7 @@ INSERT INTO user_tb (username, password, email, created_at) VALUES
 ('cos', '1234', 'cos@gmail.com', NOW()),
 ('hong', '1234', 'hong@naver.com', NOW()),
 ('kim', '1234', 'kim@daum.net', NOW());
+--('asd', '1234', 'a@naver.com', NOW());
 
 -- 2단계: Board 테이블 데이터 (10개의 게시글)
 -- 주의: user_id는 위에서 생성된 사용자의 id를 참조

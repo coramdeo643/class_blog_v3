@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class UserController {
 
     private final UserRepository ur;
-    private HttpSession hs;
+    private final HttpSession hs;
+
     /**
      * 회원가입 화면 요청
+     *
      * @return join-form.mustache
      */
     @GetMapping("/join-form")
@@ -52,6 +54,7 @@ public class UserController {
 
     /**
      * Login 화면 요청
+     *
      * @return login-form.mustache
      */
     @GetMapping("/login-form")
@@ -85,14 +88,21 @@ public class UserController {
                 throw new IllegalArgumentException("Invalid username or password");
             }
             // 4. login success
-
-
+            hs.setAttribute("sessionUser", user);
+            // 5. redirect to main page
             return "redirect:/";
+
         } catch (Exception e) {
             // 필요하다면 Error message 생성
-
             return "user/login-form";
         }
+    }
+
+    // log-out
+    @GetMapping("/logout")
+    public String logout() {
+        hs.invalidate();
+        return "redirect:/";
     }
 
     // update 화면 요청
@@ -100,12 +110,4 @@ public class UserController {
     public String updateForm() {
         return "user/update-form";
     }
-
-    @GetMapping("/logout")
-    public String logout() {
-        // "redirect : " 스프링에서 접두사를 사용하면 다른 URL 로 리다이렉트됨
-        // 즉 리다이렉트 한다는것은 뷰를 렌더링하지않고 브라우저가 재요청
-        return "redirect:/";
-    }
-
 }
