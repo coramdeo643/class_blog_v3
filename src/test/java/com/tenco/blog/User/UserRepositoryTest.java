@@ -36,14 +36,21 @@ public class UserRepositoryTest {
     @Test
     public void findByUsername_사용자조회_테스트() {
         //given
-        User user = User.builder().username("testUser")
-                .email("a@naver.com").password("asd1234")
-                .build();
+        String username = "testUser";
         //when
-        User foundUser = userRepository.findByUsername("testUser");
+        User foundUser = userRepository.findByUsername(username);
         //then
-        //
+        Assertions.assertThat(foundUser.getUsername()).isEqualTo("testUser");
+    }
 
+    @Test
+    public void findByUsername_존재하지_않는_사용자_테스트() {
+        //given
+        String username = "nonUser";
+        //when
+        User user = userRepository.findByUsername(username);
+        //then : 기대값 = null
+        Assertions.assertThat(user).isNull();
     }
 
 }

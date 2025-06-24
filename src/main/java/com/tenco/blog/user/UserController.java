@@ -1,16 +1,52 @@
 package com.tenco.blog.user;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
+@RequiredArgsConstructor // DI
 @Controller
 public class UserController {
 
-    // 회원가입 화면 요청
+    private final UserRepository userRepository;
+
+    /**
+     * 회원가입 화면 요청
+     * @return join-form.mustache
+     */
     @GetMapping("/join-form")
     public String joinForm() {
         return "user/join-form";
     }
+
+    // 회원가입 액션 처리
+    @PostMapping("/join")
+    public String join(UserRequest.JoinDTO joinDTO) {
+        System.out.println("=========== 회원가입요청 ============");
+        System.out.println("username = " + joinDTO.getUsername());
+        System.out.println("user email = " + joinDTO.getEmail());
+
+        try {
+            // 1. 입력 데이터 검증(유효성 검사)
+            joinDTO.validate(); // defensive code
+            // 2. 사용자명 중복 체크 username unique
+            User existUser = userRepository.findByUsername(joinDTO.getUsername());
+            if (existUser != null) {
+                throw new IllegalArgumentException("Username already exists;" + joinDTO.getUsername());
+            }
+            // 3. 저장요청 : DTO 를 user obj로 변환
+            User user = joinDTO.toEntity();
+            // 4. user obj 영속화 처리
+            userRepository.save(user);
+            return "redirect:/login-form";
+
+        } catch (Exception e) {
+            // 검증 실패시 보통 에러메세지와 함께 다시 회원가입화면으로 전달
+            return "user/join-form";
+        }
+    }
+
 
     // Login 화면 요청
     @GetMapping("/login-form")
