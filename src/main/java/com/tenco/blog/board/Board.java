@@ -3,16 +3,21 @@ package com.tenco.blog.board;
 import com.tenco.blog.user.User;
 import com.tenco.blog.utils.MyDateUtil;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
-@NoArgsConstructor // 기본 생성자 = JPA 에서 Entity 는 기본 생성자가 필요
+
 @Data
 @Table(name = "board_tb")
 @Entity
+@Builder
+@NoArgsConstructor // 기본 생성자 = JPA 에서 Entity 는 기본 생성자가 필요
+@AllArgsConstructor
 public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
