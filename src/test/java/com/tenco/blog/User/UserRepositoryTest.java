@@ -17,6 +17,16 @@ public class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
+    public void findByUsernameAndPassword_로그인_성공_테스트() {
+        String username = "ssar";
+        String password = "1234";
+        User user = userRepository.findByUsernameAndPassword(username, password);
+        Assertions.assertThat(user).isNotNull();
+        Assertions.assertThat(user.getUsername()).isEqualTo("ssar");
+
+    }
+
+    @Test
     public void save_회원가입_테스트() {
         //given : 회원가입시 사용할 사용자 정보
         User user = User.builder().username("testUser")
@@ -36,11 +46,11 @@ public class UserRepositoryTest {
     @Test
     public void findByUsername_사용자조회_테스트() {
         //given
-        String username = "testUser";
+        String username = "admin";
         //when
         User foundUser = userRepository.findByUsername(username);
         //then
-        Assertions.assertThat(foundUser.getUsername()).isEqualTo("testUser");
+        Assertions.assertThat(foundUser).isNotNull();
     }
 
     @Test

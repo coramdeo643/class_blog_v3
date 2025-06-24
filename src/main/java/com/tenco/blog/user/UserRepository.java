@@ -8,8 +8,29 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor // = DI
 @Repository // IoC + Singleton pattern
 public class UserRepository {
-
     private final EntityManager em;
+
+    /**
+     * 로그인 요청 기능(사용자정보조회)
+     * @param username
+     * @param password
+     * @return 성공시 user entity / 실패시 null return
+     */
+    public User findByUsernameAndPassword(String username, String password) {
+        // JPQL
+        String jpql = "select u from User u " +
+                "where u.username = :username and u.password = :password ";
+        try {
+            return em.createQuery(jpql, User.class)
+                    .setParameter("username", username)
+                    .setParameter("password", password)
+                    .getSingleResult();
+        } catch (Exception e) {
+            // 일치하는 사용자가 없거나 에러 발생시 null 반환
+            // 즉, 로그인 실패를 의미한다
+            return null;
+        }
+    }
 
     /**
      * Sign-in (User insert / save user info.)
@@ -31,7 +52,7 @@ public class UserRepository {
 //        typedQuery.setParameter("username", username);
 //        return typedQuery.getSingleResult();
         try {
-            String jpql = "select u from User u where u.username = :username; ";
+            String jpql = "select u from User u where u.username = :username ";
             return em.createQuery(jpql, User.class)
                     .setParameter("username", username)
                     .getSingleResult();

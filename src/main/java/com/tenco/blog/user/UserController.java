@@ -1,6 +1,7 @@
 package com.tenco.blog.user;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,8 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class UserController {
 
-    private final UserRepository userRepository;
-
+    private final UserRepository ur;
+    private HttpSession hs;
     /**
      * 회원가입 화면 요청
      * @return join-form.mustache
@@ -32,14 +33,14 @@ public class UserController {
             // 1. 입력 데이터 검증(유효성 검사)
             joinDTO.validate(); // defensive code
             // 2. 사용자명 중복 체크 username unique
-            User existUser = userRepository.findByUsername(joinDTO.getUsername());
+            User existUser = ur.findByUsername(joinDTO.getUsername());
             if (existUser != null) {
                 throw new IllegalArgumentException("Username already exists;" + joinDTO.getUsername());
             }
             // 3. 저장요청 : DTO 를 user obj로 변환
             User user = joinDTO.toEntity();
             // 4. user obj 영속화 처리
-            userRepository.save(user);
+            ur.save(user);
             return "redirect:/login-form";
 
         } catch (Exception e) {
@@ -49,16 +50,52 @@ public class UserController {
         }
     }
 
-
-    // Login 화면 요청
+    /**
+     * Login 화면 요청
+     * @return login-form.mustache
+     */
     @GetMapping("/login-form")
     public String loginForm() {
         // 반환값이 뷰(파일)이름이 됨(뷰리졸버가 실제파일 경로를 찾아감)
         return "user/login-form";
     }
 
-    // update 화면 요청
+    // Login action : 자원의 요청은 GET,
+    // but login request is exceptional = 보안상 이유
+    // 1. 입력 데이터 검증
+    // 2. 사용자명과 비밀번호를 DB에 접근해서 조회
+    // 3. 로그인 성공과 실패에 따른 동작 설정 처리
+    // 4. 로그인 성공, 서버측 메모리인 세션 메모리에 사용자 정보를 저장
+    // 5. 메인화면으로 redirect:/
+    // 6. 로그인 실패, 오류메세지 .
+    @PostMapping("/login")
+    public String login(UserRequest.LoginDTO loginDTO, HttpServletRequest request) {
+        System.out.println("== Log in ==");
+        System.out.println("USERNAME = " + loginDTO.getUsername());
 
+        try {
+            // 1. validation
+            loginDTO.validate();
+            // 2. DB
+            User user = ur.findByUsernameAndPassword(
+                    loginDTO.getUsername(), loginDTO.getPassword());
+            // 3. if login failed,
+            if (user == null) {
+                // login fail : no user
+                throw new IllegalArgumentException("Invalid username or password");
+            }
+            // 4. login success
+
+
+            return "redirect:/";
+        } catch (Exception e) {
+            // 필요하다면 Error message 생성
+
+            return "user/login-form";
+        }
+    }
+
+    // update 화면 요청
     @GetMapping("/user/update-form")
     public String updateForm() {
         return "user/update-form";

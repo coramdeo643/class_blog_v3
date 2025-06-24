@@ -44,4 +44,24 @@ public class UserRequest {
             }
         }
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LoginDTO { // DTO for Log-in
+        private String username;
+        private String password;
+
+        // Validation
+        public void validate() {
+            if (username == null || username.trim().isEmpty()) {
+                throw new IllegalArgumentException("Insert the username");
+            }
+            if (password == null || password.trim().isEmpty()) {
+                throw new IllegalArgumentException("Insert the password");
+            }
+
+        }
+    }
 }
