@@ -1,5 +1,6 @@
 package com.tenco.blog.user;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,7 @@ public class UserController {
 
     // 회원가입 액션 처리
     @PostMapping("/join")
-    public String join(UserRequest.JoinDTO joinDTO) {
+    public String join(UserRequest.JoinDTO joinDTO, HttpServletRequest request) {
         System.out.println("=========== 회원가입요청 ============");
         System.out.println("username = " + joinDTO.getUsername());
         System.out.println("user email = " + joinDTO.getEmail());
@@ -42,7 +43,8 @@ public class UserController {
             return "redirect:/login-form";
 
         } catch (Exception e) {
-            // 검증 실패시 보통 에러메세지와 함께 다시 회원가입화면으로 전달
+            // 검증 실패시 보통 에러메세지와 함께 다시 회원가입화면으로 전달\
+            request.setAttribute("errorMessage", "Wrong request");
             return "user/join-form";
         }
     }
