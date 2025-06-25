@@ -9,17 +9,20 @@ import lombok.Data;
  */
 public class BoardRequest {
 
+    // 게시글 수정용 DTO 설계
     @Data
     public static class UpdateDTO {
         private String title;
         private String content;
+        // toEntity method 없어도 됨 dirty checking 활용
+        // 유효성 검사
 //        private String username;
-        public void validate() throws IllegalAccessException {
+        public void validate() {
             if(title == null  || title.trim().isEmpty()) {
-                throw new IllegalAccessException("제목은 필수 입니다");
+                throw new IllegalArgumentException("Insert the title");
             }
             if(content == null || content.trim().isEmpty()) {
-                throw new IllegalAccessException("내용은 필수 입니다");
+                throw new IllegalArgumentException("Insert the content");
             }
         }
     }

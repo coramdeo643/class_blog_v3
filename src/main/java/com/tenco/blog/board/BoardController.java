@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
+import java.util.SimpleTimeZone;
 
 @RequiredArgsConstructor
 @Controller // IoC 대상 - 싱글톤 패턴으로 관리된다
@@ -25,11 +26,11 @@ public class BoardController {
     // 4. 수정 폼에 기존 데이터 뷰 바인딩
     @GetMapping("/board/{id}/update-form")
     public String updateForm(
-            @PathVariable(name="id") Long boardId,
+            @PathVariable(name = "id") Long boardId,
             HttpServletRequest req, HttpSession hs) {
         // 1.
         User sessionUser = (User) hs.getAttribute("sessionUser");
-        if(sessionUser == null) {
+        if (sessionUser == null) {
             return "redirect:/login-form";
         }
         // 2.
@@ -38,13 +39,41 @@ public class BoardController {
             throw new RuntimeException("There is no post to update");
         }
         // 3.
-        if(!b.isOwner(sessionUser.getId())) {
+        if (!b.isOwner(sessionUser.getId())) {
             throw new RuntimeException("Not eligible to update");
         }
         // 4.
         req.setAttribute("board", b);
         // 내부에서 스프링컨테이너 뷰 리졸브를 활용해서 머스태치 파일 찾기
         return "board/update-form";
+    }
+
+    // 게시글 수정 액션 : Dirty checking
+    // /board/{{board.id}}/update-form
+    // 1. 인증검사 - 로그인체크
+    // 2. 유효성검사 - 데이터 검증
+    // 3. 권한체크를 위해 게시글 다시 조회
+    // 4. 더티체킹을 통한 수정 설정
+    // 5. 수정 완료 후 게시글 상세보기로 redirect.
+    @PostMapping("/board/{id}/update-form")
+    public String update(@PathVariable(name = "id") Long boardId,
+                         BoardRequest.UpdateDTO reqDTO,
+                         HttpSession hs) {
+        // 1.
+        User sessionUser = (User) hs.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/login-form";
+        }
+        // 2.
+        reqDTO.validate();
+        // 3.
+        Board board = boardRepository.findById(boardId);
+        if(!board.isOwner(sessionUser.getId())) {
+            throw new RuntimeException("Not eligible to update");
+        }
+        //4.
+        boardRepository.updateById(boardId,reqDTO);
+        return "redirect:/board/" + boardId; // http://localhost:8080/board/1
     }
 
     // 게시글 삭제 액션 처리
@@ -58,7 +87,7 @@ public class BoardController {
     public String delete(@PathVariable(name = "id") Long id, HttpSession hs) {
         // 1. 로그인 체크 Define.SESSION_USER
         User sessionUser = (User) hs.getAttribute("sessionUser"); // object 로 떨어짐 > user로 다운캐스팅
-        if(sessionUser == null) {
+        if (sessionUser == null) {
             // 로그인 하라고 redirect
             // redirect:/ >> 내부에서 페이지 찾는것 아님,
             // 다시 클라이언트에 와서 > GET 요청이 온 것 > HTTP 메세지 생성됨
@@ -70,7 +99,7 @@ public class BoardController {
             throw new IllegalArgumentException("It is deleted already");
         }
         // 2. 권한체크
-        if(!board.isOwner(sessionUser.getId())) {
+        if (!board.isOwner(sessionUser.getId())) {
             throw new RuntimeException("Not eligible to delete");
         }
 //        if (!(sessionUser.getId() == board.getUser().getId())) {
@@ -81,8 +110,10 @@ public class BoardController {
         // redirect
         return "redirect:/";
     }
+
     /**
      * Addess : http:// 8080/
+     *
      * @param session
      * @return
      */
@@ -96,6 +127,7 @@ public class BoardController {
         }
         return "board/save-form";
     }
+
     // http://localhost:8080/board/save
     // Post save action
     @PostMapping("/board/save")
