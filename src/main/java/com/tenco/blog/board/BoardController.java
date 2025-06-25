@@ -40,9 +40,12 @@ public class BoardController {
             throw new IllegalArgumentException("It is deleted already");
         }
         // 2. 권한체크
-        if (!(sessionUser.getId() == board.getUser().getId())) {
+        if(!board.isOwner(sessionUser.getId())) {
             throw new RuntimeException("Not eligible to delete");
         }
+//        if (!(sessionUser.getId() == board.getUser().getId())) {
+//            throw new RuntimeException("Not eligible to delete");
+//        }
         // 3. 권한확인이후 삭제처리
         boardRepository.deleteById(id);
         // redirect
