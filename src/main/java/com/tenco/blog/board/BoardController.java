@@ -17,6 +17,36 @@ public class BoardController {
     // Dependencies Injection
     private final BoardRepository boardRepository;
 
+    // 게시글 수정하기 화면 요청
+    // /board/{{board.id}}/update-form
+    // 1. 인증검사(로그인)
+    // 2. 수정할 게시글 존재여부확인
+    // 3. 권한 체크
+    // 4. 수정 폼에 기존 데이터 뷰 바인딩
+    @GetMapping("/board/{id}/update-form")
+    public String updateForm(
+            @PathVariable(name="id") Long boardId,
+            HttpServletRequest req, HttpSession hs) {
+        // 1.
+        User sessionUser = (User) hs.getAttribute("sessionUser");
+        if(sessionUser == null) {
+            return "redirect:/login-form";
+        }
+        // 2.
+        Board b = boardRepository.findById(boardId);
+        if (b == null) {
+            throw new RuntimeException("There is no post to update");
+        }
+        // 3.
+        if(!b.isOwner(sessionUser.getId())) {
+            throw new RuntimeException("Not eligible to update");
+        }
+        // 4.
+        req.setAttribute("board", b);
+        // 내부에서 스프링컨테이너 뷰 리졸브를 활용해서 머스태치 파일 찾기
+        return "board/update-form";
+    }
+
     // 게시글 삭제 액션 처리
     // /board/{{board.id}}/delete method="post"
     // 1. 로그인 여부 확인(인증검사)
@@ -51,11 +81,6 @@ public class BoardController {
         // redirect
         return "redirect:/";
     }
-//    @PostMapping("/board/{id}/delete")
-//    public String delete(@PathVariable(name = "id") Long id) {
-//        boardRepository.deleteById(id);
-//        return "redirect:/";
-//    }
     /**
      * Addess : http:// 8080/
      * @param session
