@@ -16,6 +16,8 @@ public class UserRepositoryTest {
     @Autowired // DI
     private UserRepository userRepository;
 
+
+
     @Test
     public void findByUsernameAndPassword_로그인_성공_테스트() {
         String username = "ssar";
@@ -23,7 +25,6 @@ public class UserRepositoryTest {
         User user = userRepository.findByUsernameAndPassword(username, password);
         Assertions.assertThat(user).isNotNull();
         Assertions.assertThat(user.getUsername()).isEqualTo("ssar");
-
     }
 
     @Test

@@ -17,14 +17,44 @@ public class BoardController {
     // Dependencies Injection
     private final BoardRepository boardRepository;
 
+    // 게시글 삭제 액션 처리
+    // /board/{{board.id}}/delete method="post"
+    // 1. 로그인 여부 확인(인증검사)
+    //  > 로그인 안되어있으면, 로그인 페이지로 리다이렉트 처리
+    //  > 로그인 되있으면, 게시글이 존재하는지 다시 확인 - 없으면, 이미 삭제된 게시물입니다
+    // 2. 권한 체크(1번 유저 게시물인데 3번 유저가 삭제할수없음)
+    // 3. 삭제 후, 인덱스(리스트) 화면으로 redirect
     @PostMapping("/board/{id}/delete")
-        public String delete(@PathVariable(name = "id") Long id) {
+    public String delete(@PathVariable(name = "id") Long id, HttpSession hs) {
+        // 1. 로그인 체크 Define.SESSION_USER
+        User sessionUser = (User) hs.getAttribute("sessionUser"); // object 로 떨어짐 > user로 다운캐스팅
+        if(sessionUser == null) {
+            // 로그인 하라고 redirect
+            // redirect:/ >> 내부에서 페이지 찾는것 아님,
+            // 다시 클라이언트에 와서 > GET 요청이 온 것 > HTTP 메세지 생성됨
+            return "redirect:/login-form";
+        }
+        // 게시물 존재여부확인(내가 삭제하기전에 삭제되어있을수도있음)
+        Board board = boardRepository.findById(id);
+        if (board == null) {
+            throw new IllegalArgumentException("It is deleted already");
+        }
+        // 2. 권한체크
+        if (!(sessionUser.getId() == board.getUser().getId())) {
+            throw new RuntimeException("Not eligible to delete");
+        }
+        // 3. 권한확인이후 삭제처리
         boardRepository.deleteById(id);
+        // redirect
         return "redirect:/";
     }
+//    @PostMapping("/board/{id}/delete")
+//    public String delete(@PathVariable(name = "id") Long id) {
+//        boardRepository.deleteById(id);
+//        return "redirect:/";
+//    }
     /**
      * Addess : http:// 8080/
-     *
      * @param session
      * @return
      */
@@ -61,7 +91,6 @@ public class BoardController {
             return "board/save-form";
         }
     }
-
 
     @GetMapping("/")
     public String index(HttpServletRequest request) {
