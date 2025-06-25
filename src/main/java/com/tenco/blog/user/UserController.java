@@ -14,6 +14,39 @@ public class UserController {
     private final UserRepository ur;
     private final HttpSession hs;
 
+    // update 화면 요청
+    @GetMapping("/user/update-form")
+    public String updateForm(HttpServletRequest request, HttpSession hs) {
+        // 1. login check
+        User sUser = (User) hs.getAttribute("sessionUser");
+        if(sUser == null) {
+            return "redirect:/login-form";
+        }
+        request.setAttribute("user", sUser);
+        return "user/update-form";
+    }
+
+    // update action
+    @PostMapping("/user/update")
+    public String update(
+            UserRequest.UpdateDTO reqDTO, HttpSession hs, HttpServletRequest request) {
+        // 1. login check
+        User sUser = (User) hs.getAttribute("sessionUser");
+        if(sUser == null) {
+            return "redirect:/login-form";
+        }
+        // 2. validation
+        reqDTO.validate();
+        // 권한체크 필요없음 = 세션에서 정보를 가져오기때문
+        User updateUser = ur.updateById(sUser.getId(), reqDTO);
+        // session sync.
+        hs.setAttribute("sessionUser", updateUser);
+
+        // 다시 회원정보 보기 화면으로 redirect
+        return "redirect:/user/update-form";
+        // return "redirect:/user/update-form?error=error_message";
+    }
+
     /**
      * 회원가입 화면 요청
      *
@@ -103,11 +136,5 @@ public class UserController {
     public String logout() {
         hs.invalidate();
         return "redirect:/";
-    }
-
-    // update 화면 요청
-    @GetMapping("/user/update-form")
-    public String updateForm() {
-        return "user/update-form";
     }
 }

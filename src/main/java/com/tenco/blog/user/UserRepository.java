@@ -12,6 +12,7 @@ public class UserRepository {
 
     /**
      * 로그인 요청 기능(사용자정보조회)
+     *
      * @param username
      * @param password
      * @return 성공시 user entity / 실패시 null return
@@ -59,5 +60,23 @@ public class UserRepository {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public User findById(Long id) {
+        User user = em.find(User.class, id);
+        if (user == null) {
+            throw new RuntimeException("User not found with id : " + id);
+        }
+        return user;
+    }
+
+    @Transactional
+    public User updateById(Long id, UserRequest.UpdateDTO reqDTO) {
+        // 조회, 객체의 상태값 변경, 트랜잭션 처리 >> update
+        User user = findById(id);
+        // password update 객체의 상태값을 행위를 통해서 변경
+        user.setPassword(reqDTO.getPassword());
+        // updated 영속 entity 반환(session 동기화)
+        return user;
     }
 }

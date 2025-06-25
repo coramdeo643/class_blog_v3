@@ -64,4 +64,24 @@ public class UserRequest {
 
         }
     }
+
+    // user info update
+    @Data
+    public static class UpdateDTO {
+        private String password;
+        private String email;
+        // username = unique, not able to update
+        // toEntity = dirty checking
+        public void validate() {
+            if (password == null || password.trim().isEmpty()) {
+                throw new IllegalArgumentException("Insert the password");
+            }
+            if (password.length() < 4 || password.length() > 100) {
+                throw new IllegalArgumentException("Invalid password length(4~100)");
+            }
+            if (email == null || email.trim().isEmpty()) {
+                throw new IllegalArgumentException("Insert the email");
+            }
+        }
+    }
 }

@@ -76,3 +76,31 @@ public String updateForm(
         // 3) 트랜잭션 커밋시점에 변경된 필드만 update 쿼리 자동생성
         return board;
     }
+
+// 게시글 수정 액션 : Dirty checking
+// /board/{{board.id}}/update-form
+// 1. 인증검사 - 로그인체크
+// 2. 유효성검사 - 데이터 검증
+// 3. 권한체크를 위해 게시글 다시 조회
+// 4. 더티체킹을 통한 수정 설정
+// 5. 수정 완료 후 게시글 상세보기로 redirect.
+@PostMapping("/board/{id}/update-form")
+public String update(@PathVariable(name = "id") Long boardId,
+                     BoardRequest.UpdateDTO reqDTO,
+                     HttpSession hs) {
+    // 1.
+    User sessionUser = (User) hs.getAttribute("sessionUser");
+    if (sessionUser == null) {
+        return "redirect:/login-form";
+    }
+    // 2.
+    reqDTO.validate();
+    // 3.
+    Board board = boardRepository.findById(boardId);
+    if(!board.isOwner(sessionUser.getId())) {
+        throw new RuntimeException("Not eligible to update");
+    }
+    //4.
+    boardRepository.updateById(boardId,reqDTO);
+    return "redirect:/board/" + boardId; // http://localhost:8080/board/1
+}

@@ -20,6 +20,7 @@ public class User {
 
     // Username 중복 방지 unique true setting
     @Column(unique = true)
+    //@Column(length = 20, nullable = false) 제약사항 설정 가능!!!
     private String username;
 
     private String password;
